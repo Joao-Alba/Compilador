@@ -1,6 +1,8 @@
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
+import java.io.*;
+import java.util.Objects;
 
 public class Main {
 
@@ -9,7 +11,7 @@ public class Main {
     private static final JPanel toolBarPanel = new JPanel();
     private static final JButton newFileButton = new JButton("Novo [ctrl-n]");
     private static final JButton openFileButton = new JButton("Abrir [ctrl-o]");
-    private static final JButton saveFileButton = new JButton("Salvas [ctrl-s]");
+    private static final JButton saveFileButton = new JButton("Salvar [ctrl-s]");
     private static final JButton copyButton = new JButton("Copiar [ctrl-c]");
     private static final JButton pasteButton = new JButton("Colar [ctrl-v]");
     private static final JButton cutButton = new JButton("Recortar [ctrl-x]");
@@ -20,6 +22,8 @@ public class Main {
     private static final JTextArea messageTextArea = new JTextArea();
     private static final JPanel statusPanel = new JPanel();
     private static final JLabel statusLabel = new JLabel(" ");
+    private static final JFileChooser fileChooser = new JFileChooser();
+    private static File openedFile;
 
     /**
      * Launch the application.
@@ -117,8 +121,8 @@ public class Main {
             @Override
             public void actionPerformed(ActionEvent e) {
                 codeEditorTextArea.setText("");
-                messageTextArea.setText(" ");
-                //barra de status
+                messageTextArea.setText("");
+                statusLabel.setText(" ");
             }
         };
         newFileButton.addActionListener(newFileAction);
@@ -129,7 +133,30 @@ public class Main {
         Action openFileAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-//                openFile();
+                int returnVal = fileChooser.showOpenDialog(frame);
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    try {
+                        File file = fileChooser.getSelectedFile();
+
+                        if(!file.getName().contains(".txt")){
+                            throw new RuntimeException();
+                        }
+
+                        BufferedReader br = new BufferedReader(new FileReader(file));
+                        String string = "";
+                        while(Objects.nonNull(string = br.readLine())){
+                            codeEditorTextArea.setText(codeEditorTextArea.getText() + "\n" + string);
+                        }
+
+                        messageTextArea.setText("");
+                        statusLabel.setText(file.getName());
+
+                    } catch (FileNotFoundException ex) {
+                        throw new RuntimeException("Arquivo inválido");
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
             }
         };
         openFileButton.addActionListener(openFileAction);
@@ -141,6 +168,7 @@ public class Main {
             @Override
             public void actionPerformed(ActionEvent e) {
 //                saveFile();
+                int returnVal = fileChooser.showOpenDialog(frame);
             }
         };
         saveFileButton.addActionListener(saveFileAction);
