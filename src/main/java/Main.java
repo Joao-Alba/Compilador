@@ -1,27 +1,5 @@
-
-import java.awt.Dimension;
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.Image;
-
-import javax.swing.BoxLayout;
-import javax.swing.Icon;
-
-import java.awt.BorderLayout;
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-import javax.swing.JTextArea;
-import javax.swing.JToolBar;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JScrollPane;
-import java.awt.Rectangle;
-import java.awt.Component;
-import javax.swing.ImageIcon;
-import java.awt.Font;
+import javax.swing.*;
+import java.awt.*;
 
 public class Main {
 
@@ -31,14 +9,12 @@ public class Main {
      * Launch the application.
      */
     public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    Main window = new Main();
-                    window.frame.setVisible(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        EventQueue.invokeLater(() -> {
+            try {
+                Main window = new Main();
+                window.frame.setVisible(true);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
     }
@@ -110,7 +86,6 @@ public class Main {
         toolBarPanel.add(teamButton);
 
 
-
         JSplitPane splitPane = new JSplitPane();
         splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
         mainPanel.add(splitPane, BorderLayout.CENTER);
@@ -125,6 +100,10 @@ public class Main {
         splitPane.setRightComponent(scrollmessage);
 
 
+        copiar(copyButton, codeEditorTextArea);
+        colar(pasteButton, codeEditorTextArea);
+        recortar(cutButton, codeEditorTextArea);
+        novo(newFileButton, codeEditorTextArea, messageTextArea);
 
         JPanel statusPanel = new JPanel();
         mainPanel.add(statusPanel, BorderLayout.SOUTH);
@@ -132,13 +111,31 @@ public class Main {
 
         JLabel lblNewLabel = new JLabel(" ");
         statusPanel.add(lblNewLabel);
+    }
 
+    private static void novo(JButton newFileButton, JTextArea codeEditorTextArea, JTextArea messageTextArea) {
+        newFileButton.addActionListener(actionEvent -> {
+            codeEditorTextArea.setText("");
+            messageTextArea.setText("");
+            //barra de status
+        });
+    }
 
+    private static void recortar(JButton cutButton, JTextArea codeEditorTextArea) {
+        cutButton.addActionListener(actionEvent -> codeEditorTextArea.cut());
+    }
+
+    private static void colar(JButton pasteButton, JTextArea codeEditorTextArea) {
+        pasteButton.addActionListener(actionEvent -> codeEditorTextArea.paste());
+    }
+
+    private static void copiar(JButton copyButton, JTextArea codeEditorTextArea) {
+        copyButton.addActionListener(actionEvent -> codeEditorTextArea.copy());
     }
 
     private ImageIcon resizeIcon(String path) {
         ImageIcon imageIcon = new ImageIcon(path);
-        Image image = imageIcon.getImage(); // transform it
+        Image image = imageIcon.getImage();
         Image newimg = image.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
         return new ImageIcon(newimg);
     }
