@@ -23,7 +23,7 @@ public class Main {
     private static final JPanel statusPanel = new JPanel();
     private static final JLabel statusLabel = new JLabel(" ");
     private static final JFileChooser fileChooser = new JFileChooser();
-    private static File openedFile;
+    private static File openedFile = null;
 
     /**
      * Launch the application.
@@ -61,53 +61,53 @@ public class Main {
         toolBarPanel.setMinimumSize(new Dimension(900, 70));
         mainPanel.add(toolBarPanel, BorderLayout.NORTH);
         toolBarPanel.setLayout(new BoxLayout(toolBarPanel, BoxLayout.X_AXIS));
-        
+
         newFileButton.setFont(new Font("Tahoma", Font.PLAIN, 9));
         newFileButton.setIcon(this.resizeIcon("src/img/novo.png"));
         toolBarPanel.add(newFileButton);
-        
+
         openFileButton.setFont(new Font("Tahoma", Font.PLAIN, 9));
         openFileButton.setIcon(this.resizeIcon("src/img/abrir.png"));
         toolBarPanel.add(openFileButton);
-        
+
         saveFileButton.setFont(new Font("Tahoma", Font.PLAIN, 9));
         saveFileButton.setIcon(this.resizeIcon("src/img/salvar.png"));
         toolBarPanel.add(saveFileButton);
-        
+
         copyButton.setFont(new Font("Tahoma", Font.PLAIN, 9));
         copyButton.setIcon(this.resizeIcon("src/img/copiar.png"));
         toolBarPanel.add(copyButton);
-        
+
         pasteButton.setFont(new Font("Tahoma", Font.PLAIN, 9));
         pasteButton.setIcon(this.resizeIcon("src/img/colar.png"));
         toolBarPanel.add(pasteButton);
-        
+
         cutButton.setFont(new Font("Tahoma", Font.PLAIN, 9));
         cutButton.setIcon(this.resizeIcon("src/img/recortar.png"));
         toolBarPanel.add(cutButton);
-        
+
         compileButton.setFont(new Font("Tahoma", Font.PLAIN, 9));
         compileButton.setIcon(this.resizeIcon("src/img/compilar.png"));
         toolBarPanel.add(compileButton);
-        
+
         teamButton.setFont(new Font("Tahoma", Font.PLAIN, 9));
         teamButton.setIcon(this.resizeIcon("src/img/equipe.png"));
         toolBarPanel.add(teamButton);
 
-        
+
         splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
         mainPanel.add(splitPane, BorderLayout.CENTER);
-        
+
         codeEditorTextArea.setBorder(new NumberedBorder());
         JScrollPane scrollEditor = new JScrollPane(codeEditorTextArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         splitPane.setLeftComponent(scrollEditor);
-        
+
         messageTextArea.setEnabled(false);
         messageTextArea.setDisabledTextColor(Color.black);
         JScrollPane scrollmessage = new JScrollPane(messageTextArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         splitPane.setRightComponent(scrollmessage);
-        
-        
+
+
         statusPanel.setMinimumSize(new Dimension(900, 25));
         mainPanel.add(statusPanel, BorderLayout.SOUTH);
         statusPanel.setLayout(new BorderLayout(0, 0));
@@ -115,8 +115,8 @@ public class Main {
 
         createActions();
     }
-    
-    private void createActions(){
+
+    private void createActions() {
         Action newFileAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -138,19 +138,28 @@ public class Main {
                     try {
                         File file = fileChooser.getSelectedFile();
 
-                        if(!file.getName().contains(".txt")){
+                        if (!file.getName().contains(".txt")) {
                             throw new RuntimeException();
                         }
 
                         BufferedReader br = new BufferedReader(new FileReader(file));
                         String string = "";
+                        boolean firstLine = true;
+                        codeEditorTextArea.setText("");
                         while(Objects.nonNull(string = br.readLine())){
+                            if(firstLine) {
+                                codeEditorTextArea.setText(codeEditorTextArea.getText() + string);
+                                firstLine = false;
+                                continue;
+                            }
                             codeEditorTextArea.setText(codeEditorTextArea.getText() + "\n" + string);
                         }
 
                         messageTextArea.setText("");
-                        statusLabel.setText(file.getName());
+                        statusLabel.setText(file.getPath() + "/" + file.getName());
+                        openedFile = file;
 
+                        br.close();
                     } catch (FileNotFoundException ex) {
                         throw new RuntimeException("Arquivo inválido");
                     } catch (IOException ex) {
@@ -167,8 +176,20 @@ public class Main {
         Action saveFileAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-//                saveFile();
-                int returnVal = fileChooser.showOpenDialog(frame);
+                if (Objects.isNull(openedFile)) {
+                    int returnVal = fileChooser.showSaveDialog(frame);
+
+
+                } else {
+                    try {
+                        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(openedFile));
+
+                        bufferedWriter.write(codeEditorTextArea.getText());
+                        messageTextArea.setText("");
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
             }
         };
         saveFileButton.addActionListener(saveFileAction);
@@ -234,7 +255,7 @@ public class Main {
     private ImageIcon resizeIcon(String path) {
         ImageIcon imageIcon = new ImageIcon(path);
         Image image = imageIcon.getImage();
-        Image newimg = image.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
+        Image newimg = image.getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH);
         return new ImageIcon(newimg);
     }
 
