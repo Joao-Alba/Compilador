@@ -123,6 +123,7 @@ public class Main {
                 codeEditorTextArea.setText("");
                 messageTextArea.setText("");
                 statusLabel.setText(" ");
+                openedFile = null;
             }
         };
         newFileButton.addActionListener(newFileAction);
@@ -139,15 +140,15 @@ public class Main {
                         File file = fileChooser.getSelectedFile();
 
                         if (!file.getName().contains(".txt")) {
-                            throw new RuntimeException();
+                            throw new IOException();
                         }
 
                         BufferedReader br = new BufferedReader(new FileReader(file));
                         String string = "";
                         boolean firstLine = true;
                         codeEditorTextArea.setText("");
-                        while(Objects.nonNull(string = br.readLine())){
-                            if(firstLine) {
+                        while (Objects.nonNull(string = br.readLine())) {
+                            if (firstLine) {
                                 codeEditorTextArea.setText(codeEditorTextArea.getText() + string);
                                 firstLine = false;
                                 continue;
@@ -156,14 +157,11 @@ public class Main {
                         }
 
                         messageTextArea.setText("");
-                        statusLabel.setText(file.getPath() + "/" + file.getName());
+                        statusLabel.setText(file.getPath());
                         openedFile = file;
-
                         br.close();
-                    } catch (FileNotFoundException ex) {
-                        throw new RuntimeException("Arquivo inválido");
                     } catch (IOException ex) {
-                        throw new RuntimeException(ex);
+                        JOptionPane.showMessageDialog(frame, "Arquivo inválido.");
                     }
                 }
             }
@@ -176,19 +174,35 @@ public class Main {
         Action saveFileAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (Objects.isNull(openedFile)) {
-                    int returnVal = fileChooser.showSaveDialog(frame);
+                try {
+                    if (Objects.isNull(openedFile)) {
+                        int returnVal = fileChooser.showSaveDialog(frame);
 
+                        if (returnVal == JFileChooser.APPROVE_OPTION) {
+                            File newFile = fileChooser.getSelectedFile();
 
-                } else {
-                    try {
-                        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(openedFile));
+                            if(!newFile.getName().split("\\.")[1].equals("txt")){
+                                throw new IOException();
+                            }
+                            BufferedWriter bw = new BufferedWriter(new FileWriter(newFile));
 
-                        bufferedWriter.write(codeEditorTextArea.getText());
+                            bw.write(codeEditorTextArea.getText());
+                            messageTextArea.setText("");
+                            statusLabel.setText(newFile.getPath());
+                            openedFile = newFile;
+
+                            bw.close();
+                        }
+                    } else {
+                        BufferedWriter bw = new BufferedWriter(new FileWriter(openedFile));
+
+                        bw.write(codeEditorTextArea.getText());
                         messageTextArea.setText("");
-                    } catch (IOException ex) {
-                        throw new RuntimeException(ex);
+
+                        bw.close();
                     }
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(frame, "Tipo de arquivo inválido.");
                 }
             }
         };
