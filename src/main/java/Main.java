@@ -1,9 +1,25 @@
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
+import java.awt.event.*;
 
 public class Main {
 
     private JFrame frame;
+    private static final JPanel mainPanel = new JPanel();
+    private static final JPanel toolBarPanel = new JPanel();
+    private static final JButton newFileButton = new JButton("Novo [ctrl-n]");
+    private static final JButton openFileButton = new JButton("Abrir [ctrl-o]");
+    private static final JButton saveFileButton = new JButton("Salvas [ctrl-s]");
+    private static final JButton copyButton = new JButton("Copiar [ctrl-c]");
+    private static final JButton pasteButton = new JButton("Colar [ctrl-v]");
+    private static final JButton cutButton = new JButton("Recortar [ctrl-x]");
+    private static final JButton compileButton = new JButton("Compilar [F7]");
+    private static final JButton teamButton = new JButton("Equipe [F1]");
+    private static final JSplitPane splitPane = new JSplitPane();
+    private static final JTextArea codeEditorTextArea = new JTextArea();
+    private static final JTextArea messageTextArea = new JTextArea();
+    private static final JPanel statusPanel = new JPanel();
+    private static final JLabel statusLabel = new JLabel(" ");
 
     /**
      * Launch the application.
@@ -34,103 +50,157 @@ public class Main {
         frame.setBounds(100, 100, 910, 600);
         frame.setMinimumSize(new Dimension(910, 600));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        JPanel mainPanel = new JPanel();
         frame.getContentPane().add(mainPanel);
         mainPanel.setLayout(new BorderLayout());
 
 
-        JPanel toolBarPanel = new JPanel();
+        toolBarPanel.setMinimumSize(new Dimension(900, 70));
         mainPanel.add(toolBarPanel, BorderLayout.NORTH);
         toolBarPanel.setLayout(new BoxLayout(toolBarPanel, BoxLayout.X_AXIS));
-
-
-        JButton newFileButton = new JButton("Novo [ctrl-n]");
+        
         newFileButton.setFont(new Font("Tahoma", Font.PLAIN, 9));
         newFileButton.setIcon(this.resizeIcon("src/img/novo.png"));
         toolBarPanel.add(newFileButton);
-
-        JButton openFileButton = new JButton("Abrir [ctrl-o]");
+        
         openFileButton.setFont(new Font("Tahoma", Font.PLAIN, 9));
         openFileButton.setIcon(this.resizeIcon("src/img/abrir.png"));
         toolBarPanel.add(openFileButton);
-
-        JButton saveFileButton = new JButton("Salvas [ctrl-s]");
+        
         saveFileButton.setFont(new Font("Tahoma", Font.PLAIN, 9));
         saveFileButton.setIcon(this.resizeIcon("src/img/salvar.png"));
         toolBarPanel.add(saveFileButton);
-
-        JButton copyButton = new JButton("Copiar [ctrl-c]");
+        
         copyButton.setFont(new Font("Tahoma", Font.PLAIN, 9));
         copyButton.setIcon(this.resizeIcon("src/img/copiar.png"));
         toolBarPanel.add(copyButton);
-
-        JButton pasteButton = new JButton("Colar [ctrl-v]");
+        
         pasteButton.setFont(new Font("Tahoma", Font.PLAIN, 9));
         pasteButton.setIcon(this.resizeIcon("src/img/colar.png"));
         toolBarPanel.add(pasteButton);
-
-        JButton cutButton = new JButton("Recortar [ctrl-x]");
+        
         cutButton.setFont(new Font("Tahoma", Font.PLAIN, 9));
         cutButton.setIcon(this.resizeIcon("src/img/recortar.png"));
         toolBarPanel.add(cutButton);
-
-        JButton compileButton = new JButton("Compilar [F7]");
+        
         compileButton.setFont(new Font("Tahoma", Font.PLAIN, 9));
         compileButton.setIcon(this.resizeIcon("src/img/compilar.png"));
         toolBarPanel.add(compileButton);
-
-        JButton teamButton = new JButton("Equipe [F1]");
+        
         teamButton.setFont(new Font("Tahoma", Font.PLAIN, 9));
         teamButton.setIcon(this.resizeIcon("src/img/equipe.png"));
         toolBarPanel.add(teamButton);
 
-
-        JSplitPane splitPane = new JSplitPane();
+        
         splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
         mainPanel.add(splitPane, BorderLayout.CENTER);
-
-        JTextArea codeEditorTextArea = new JTextArea();
+        
         codeEditorTextArea.setBorder(new NumberedBorder());
         JScrollPane scrollEditor = new JScrollPane(codeEditorTextArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         splitPane.setLeftComponent(scrollEditor);
-
-        JTextArea messageTextArea = new JTextArea();
+        
+        messageTextArea.setEnabled(false);
+        messageTextArea.setDisabledTextColor(Color.black);
         JScrollPane scrollmessage = new JScrollPane(messageTextArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         splitPane.setRightComponent(scrollmessage);
-
-
-        copiar(copyButton, codeEditorTextArea);
-        colar(pasteButton, codeEditorTextArea);
-        recortar(cutButton, codeEditorTextArea);
-        novo(newFileButton, codeEditorTextArea, messageTextArea);
-
-        JPanel statusPanel = new JPanel();
+        
+        
+        statusPanel.setMinimumSize(new Dimension(900, 25));
         mainPanel.add(statusPanel, BorderLayout.SOUTH);
         statusPanel.setLayout(new BorderLayout(0, 0));
+        statusPanel.add(statusLabel);
 
-        JLabel lblNewLabel = new JLabel(" ");
-        statusPanel.add(lblNewLabel);
+        createActions();
     }
+    
+    private void createActions(){
+        Action newFileAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                codeEditorTextArea.setText("");
+                messageTextArea.setText(" ");
+                //barra de status
+            }
+        };
+        newFileButton.addActionListener(newFileAction);
+        newFileButton.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK), "newFileShortcut");
+        newFileButton.getActionMap().put("newFileShortcut", newFileAction);
 
-    private static void novo(JButton newFileButton, JTextArea codeEditorTextArea, JTextArea messageTextArea) {
-        newFileButton.addActionListener(actionEvent -> {
-            codeEditorTextArea.setText("");
-            messageTextArea.setText("");
-            //barra de status
-        });
-    }
 
-    private static void recortar(JButton cutButton, JTextArea codeEditorTextArea) {
-        cutButton.addActionListener(actionEvent -> codeEditorTextArea.cut());
-    }
+        Action openFileAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+//                openFile();
+            }
+        };
+        openFileButton.addActionListener(openFileAction);
+        openFileButton.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK), "openFileShortcut");
+        openFileButton.getActionMap().put("openFileShortcut", openFileAction);
 
-    private static void colar(JButton pasteButton, JTextArea codeEditorTextArea) {
-        pasteButton.addActionListener(actionEvent -> codeEditorTextArea.paste());
-    }
 
-    private static void copiar(JButton copyButton, JTextArea codeEditorTextArea) {
-        copyButton.addActionListener(actionEvent -> codeEditorTextArea.copy());
+        Action saveFileAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+//                saveFile();
+            }
+        };
+        saveFileButton.addActionListener(saveFileAction);
+        saveFileButton.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK), "saveFileShortcut");
+        saveFileButton.getActionMap().put("saveFileShortcut", saveFileAction);
+
+
+        Action copyAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                codeEditorTextArea.copy();
+            }
+        };
+        copyButton.addActionListener(copyAction);
+        copyButton.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK), "copyShortcut");
+        copyButton.getActionMap().put("copyShortcut", copyAction);
+
+
+        Action pasteAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                codeEditorTextArea.paste();
+            }
+        };
+        pasteButton.addActionListener(pasteAction);
+        pasteButton.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK), "pasteShortcut");
+        pasteButton.getActionMap().put("pasteShortcut", pasteAction);
+
+
+        Action cutAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                codeEditorTextArea.cut();
+            }
+        };
+        cutButton.addActionListener(cutAction);
+        cutButton.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK), "cutShortcut");
+        cutButton.getActionMap().put("cutShortcut", cutAction);
+
+
+        Action compileAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                messageTextArea.setText("compilação de programas ainda não foi implementada");
+            }
+        };
+        compileButton.addActionListener(compileAction);
+        compileButton.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_F7, 0), "compileShortcut");
+        compileButton.getActionMap().put("compileShortcut", compileAction);
+
+
+        Action teamAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                messageTextArea.setText("João Arthur Pereira Alba \nNicole Taufenbach");
+            }
+        };
+        teamButton.addActionListener(teamAction);
+        teamButton.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0), "teamShortcut");
+        teamButton.getActionMap().put("teamShortcut", teamAction);
     }
 
     private ImageIcon resizeIcon(String path) {
