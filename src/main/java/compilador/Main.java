@@ -1,7 +1,10 @@
+package compilador;
+
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 import java.io.*;
+import java.net.URL;
 import java.util.Objects;
 
 public class Main {
@@ -63,35 +66,35 @@ public class Main {
         toolBarPanel.setLayout(new BoxLayout(toolBarPanel, BoxLayout.X_AXIS));
 
         newFileButton.setFont(new Font("Tahoma", Font.PLAIN, 9));
-        newFileButton.setIcon(this.resizeIcon("src/img/novo.png"));
+        newFileButton.setIcon(this.resizeIcon("novo.png"));
         toolBarPanel.add(newFileButton);
 
         openFileButton.setFont(new Font("Tahoma", Font.PLAIN, 9));
-        openFileButton.setIcon(this.resizeIcon("src/img/abrir.png"));
+        openFileButton.setIcon(this.resizeIcon("abrir.png"));
         toolBarPanel.add(openFileButton);
 
         saveFileButton.setFont(new Font("Tahoma", Font.PLAIN, 9));
-        saveFileButton.setIcon(this.resizeIcon("src/img/salvar.png"));
+        saveFileButton.setIcon(this.resizeIcon("salvar.png"));
         toolBarPanel.add(saveFileButton);
 
         copyButton.setFont(new Font("Tahoma", Font.PLAIN, 9));
-        copyButton.setIcon(this.resizeIcon("src/img/copiar.png"));
+        copyButton.setIcon(this.resizeIcon("copiar.png"));
         toolBarPanel.add(copyButton);
 
         pasteButton.setFont(new Font("Tahoma", Font.PLAIN, 9));
-        pasteButton.setIcon(this.resizeIcon("src/img/colar.png"));
+        pasteButton.setIcon(this.resizeIcon("colar.png"));
         toolBarPanel.add(pasteButton);
 
         cutButton.setFont(new Font("Tahoma", Font.PLAIN, 9));
-        cutButton.setIcon(this.resizeIcon("src/img/recortar.png"));
+        cutButton.setIcon(this.resizeIcon("recortar.png"));
         toolBarPanel.add(cutButton);
 
         compileButton.setFont(new Font("Tahoma", Font.PLAIN, 9));
-        compileButton.setIcon(this.resizeIcon("src/img/compilar.png"));
+        compileButton.setIcon(this.resizeIcon("compilar.png"));
         toolBarPanel.add(compileButton);
 
         teamButton.setFont(new Font("Tahoma", Font.PLAIN, 9));
-        teamButton.setIcon(this.resizeIcon("src/img/equipe.png"));
+        teamButton.setIcon(this.resizeIcon("equipe.png"));
         toolBarPanel.add(teamButton);
 
 
@@ -266,8 +269,8 @@ public class Main {
         teamButton.getActionMap().put("teamShortcut", teamAction);
     }
 
-    private ImageIcon resizeIcon(String path) {
-        ImageIcon imageIcon = new ImageIcon(path);
+    private ImageIcon resizeIcon(String fileName) {
+        ImageIcon imageIcon = new ImageIcon("src/main/resources/img/" + fileName);
         Image image = imageIcon.getImage();
         Image newimg = image.getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH);
         return new ImageIcon(newimg);
