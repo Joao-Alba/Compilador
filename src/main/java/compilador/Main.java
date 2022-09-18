@@ -1,16 +1,14 @@
 package compilador;
 
-import gals.Constants;
 import gals.LexicalError;
 import gals.Lexico;
 import gals.Token;
 
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.text.BadLocationException;
 import java.awt.event.*;
 import java.io.*;
-import java.lang.reflect.Field;
-import java.net.URL;
 import java.util.Objects;
 
 public class Main {
@@ -198,7 +196,11 @@ public class Main {
         Action compileAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                compile();
+                try {
+                    compile();
+                } catch (BadLocationException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         };
         compileButton.addActionListener(compileAction);
@@ -225,7 +227,7 @@ public class Main {
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     File newFile = fileChooser.getSelectedFile();
 
-                    if(!newFile.getName().split("\\.")[1].equals("txt")){
+                    if (!newFile.getName().split("\\.")[1].equals("txt")) {
                         throw new IOException();
                     }
                     BufferedWriter bw = new BufferedWriter(new FileWriter(newFile));
@@ -283,50 +285,57 @@ public class Main {
         }
     }
 
-    private static void compile(){
-        StringBuilder tokenList = new StringBuilder("linha        classe        lexema");
+    private static void compile() throws BadLocationException {
+        StringBuilder tokenList = new StringBuilder("linha         classe                          lexema").append("\n");
         Lexico lexico = new Lexico();
         lexico.setInput(codeEditorTextArea.getText());
         try {
-            Token token = null;
-            while ((token = lexico.nextToken()) != null ) {
-                tokenList.append(calculateLinha(token.getPosition())).append("    |");
-                String classe = getClassFromTokenId(token.getId());
+            Token token;
+            while ((token = lexico.nextToken()) != null) {
+                String whiteSpaces = "                        ";
+                tokenList.append(calculateLinha(token.getPosition())).append("               ");
 
-                tokenList.append(token.getLexeme());
+                String tokenClass = getClassFromTokenId(token.getId());
+                tokenList.append(tokenClass).append(whiteSpaces.substring(tokenClass.length()));
 
-                // só escreve o lexema, necessário escrever t.getId, t.getPosition()
-
-                // t.getId () - retorna o identificador da classe. Olhar Constants.java e adaptar, pois
-                // deve ser apresentada a classe por extenso
-                // t.getPosition () - retorna a posição inicial do lexema no editor, necessário adaptar
-                // para mostrar a linha
-
-                // esse código apresenta os tokens enquanto não ocorrer erro
-                // no entanto, os tokens devem ser apresentados SÓ se não ocorrer erro, necessário adaptar
-                // para atender o que foi solicitado
+                tokenList.append(token.getLexeme()).append("\n");
             }
-        }
-        catch ( LexicalError e ) {  // tratamento de erros
-            System.out.println(e.getMessage() + " em " + e.getPosition());
 
-            // e.getMessage() - retorna a mensagem de erro de SCANNER_ERRO (olhar ScannerConstants.java
-            // e adaptar conforme o enunciado da parte 2)
-            // e.getPosition() - retorna a posição inicial do erro, tem que adaptar para mostrar a
-            // linha
+            tokenList.append("\n").append("programa compilado com sucesso");
+            messageTextArea.setText(tokenList.toString());
+
+        } catch (LexicalError e) {
+            messageTextArea.setText("Erro na linha " + calculateLinha(e.getPosition()) + " - " + e.getMessage());
+        } catch (BadLocationException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    private static int calculateLinha(int position){
-        return 0;
+    private static int calculateLinha(int position) throws BadLocationException {
+        return codeEditorTextArea.getLineOfOffset(position) + 1;
     }
 
     private static String getClassFromTokenId(int id) {
-        for (Field field : Constants.class.getDeclaredFields()) {
-            System.out.println(Constants.);
+        switch (id) {
+            case 2:
+                return "identificador";
+            case 3:
+                return "constante int";
+            case 4:
+                return "constante float";
+            case 5:
+                return "constante char";
+            case 6:
+                return "constante string";
         }
 
-        return null;
+        if (id >= 7 && id <= 26) {
+            return "palavra reservada";
+        } else if (id > -27 && id <= 48) {
+            return "símbolo especial";
+        } else {
+            return "classe inválida";
+        }
     }
 
     private static ImageIcon resizeIcon(String fileName) {
