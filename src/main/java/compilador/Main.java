@@ -39,7 +39,7 @@ public class Main {
         EventQueue.invokeLater(() -> {
             try {
                 Main window = new Main();
-                window.frame.setVisible(true);
+                frame.setVisible(true);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -70,35 +70,35 @@ public class Main {
         toolBarPanel.setLayout(new BoxLayout(toolBarPanel, BoxLayout.X_AXIS));
 
         newFileButton.setFont(new Font("Tahoma", Font.PLAIN, 9));
-        newFileButton.setIcon(this.resizeIcon("novo.png"));
+        newFileButton.setIcon(resizeIcon("novo.png"));
         toolBarPanel.add(newFileButton);
 
         openFileButton.setFont(new Font("Tahoma", Font.PLAIN, 9));
-        openFileButton.setIcon(this.resizeIcon("abrir.png"));
+        openFileButton.setIcon(resizeIcon("abrir.png"));
         toolBarPanel.add(openFileButton);
 
         saveFileButton.setFont(new Font("Tahoma", Font.PLAIN, 9));
-        saveFileButton.setIcon(this.resizeIcon("salvar.png"));
+        saveFileButton.setIcon(resizeIcon("salvar.png"));
         toolBarPanel.add(saveFileButton);
 
         copyButton.setFont(new Font("Tahoma", Font.PLAIN, 9));
-        copyButton.setIcon(this.resizeIcon("copiar.png"));
+        copyButton.setIcon(resizeIcon("copiar.png"));
         toolBarPanel.add(copyButton);
 
         pasteButton.setFont(new Font("Tahoma", Font.PLAIN, 9));
-        pasteButton.setIcon(this.resizeIcon("colar.png"));
+        pasteButton.setIcon(resizeIcon("colar.png"));
         toolBarPanel.add(pasteButton);
 
         cutButton.setFont(new Font("Tahoma", Font.PLAIN, 9));
-        cutButton.setIcon(this.resizeIcon("recortar.png"));
+        cutButton.setIcon(resizeIcon("recortar.png"));
         toolBarPanel.add(cutButton);
 
         compileButton.setFont(new Font("Tahoma", Font.PLAIN, 9));
-        compileButton.setIcon(this.resizeIcon("compilar.png"));
+        compileButton.setIcon(resizeIcon("compilar.png"));
         toolBarPanel.add(compileButton);
 
         teamButton.setFont(new Font("Tahoma", Font.PLAIN, 9));
-        teamButton.setIcon(this.resizeIcon("equipe.png"));
+        teamButton.setIcon(resizeIcon("equipe.png"));
         toolBarPanel.add(teamButton);
 
 
@@ -286,14 +286,14 @@ public class Main {
     }
 
     private static void compile() throws BadLocationException {
-        StringBuilder tokenList = new StringBuilder("linha         classe                          lexema").append("\n");
+        StringBuilder tokenList = new StringBuilder("linha      classe                  lexema").append("\n");
         Lexico lexico = new Lexico();
         lexico.setInput(codeEditorTextArea.getText());
         try {
             Token token;
             while ((token = lexico.nextToken()) != null) {
                 String whiteSpaces = "                        ";
-                tokenList.append(calculateLinha(token.getPosition())).append("               ");
+                tokenList.append(calculateLinha(token.getPosition())).append("          ");
 
                 String tokenClass = getClassFromTokenId(token.getId());
                 tokenList.append(tokenClass).append(whiteSpaces.substring(tokenClass.length()));

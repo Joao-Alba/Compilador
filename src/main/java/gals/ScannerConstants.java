@@ -1173,7 +1173,7 @@ public interface ScannerConstants
         "",
         "",
         "",
-        "Erro identificando <ignorar>",
+        "comentário de bloco inválido ou não finalizado",
         "constante char inválida",
         "",
         "Erro identificando \"||\"",
@@ -1193,7 +1193,7 @@ public interface ScannerConstants
         "",
         "constante float inválida",
         "",
-        "Erro identificando <ignorar>",
+        "comentário de bloco inválido ou não finalizado",
         "",
         ""
     };
