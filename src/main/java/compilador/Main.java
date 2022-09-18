@@ -1,15 +1,21 @@
 package compilador;
 
+import gals.Constants;
+import gals.LexicalError;
+import gals.Lexico;
+import gals.Token;
+
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 import java.io.*;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.Objects;
 
 public class Main {
 
-    private JFrame frame;
+    private static JFrame frame;
     private static final JPanel mainPanel = new JPanel();
     private static final JPanel toolBarPanel = new JPanel();
     private static final JButton newFileButton = new JButton("Novo [ctrl-n]");
@@ -137,36 +143,7 @@ public class Main {
         Action openFileAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int returnVal = fileChooser.showOpenDialog(frame);
-                if (returnVal == JFileChooser.APPROVE_OPTION) {
-                    try {
-                        File file = fileChooser.getSelectedFile();
-
-                        if (!file.getName().contains(".txt")) {
-                            throw new IOException();
-                        }
-
-                        BufferedReader br = new BufferedReader(new FileReader(file));
-                        String string = "";
-                        boolean firstLine = true;
-                        codeEditorTextArea.setText("");
-                        while (Objects.nonNull(string = br.readLine())) {
-                            if (firstLine) {
-                                codeEditorTextArea.setText(codeEditorTextArea.getText() + string);
-                                firstLine = false;
-                                continue;
-                            }
-                            codeEditorTextArea.setText(codeEditorTextArea.getText() + "\n" + string);
-                        }
-
-                        messageTextArea.setText("");
-                        statusLabel.setText(file.getPath());
-                        openedFile = file;
-                        br.close();
-                    } catch (IOException ex) {
-                        JOptionPane.showMessageDialog(frame, "Arquivo inválido.");
-                    }
-                }
+                openFile();
             }
         };
         openFileButton.addActionListener(openFileAction);
@@ -177,36 +154,7 @@ public class Main {
         Action saveFileAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    if (Objects.isNull(openedFile)) {
-                        int returnVal = fileChooser.showSaveDialog(frame);
-
-                        if (returnVal == JFileChooser.APPROVE_OPTION) {
-                            File newFile = fileChooser.getSelectedFile();
-
-                            if(!newFile.getName().split("\\.")[1].equals("txt")){
-                                throw new IOException();
-                            }
-                            BufferedWriter bw = new BufferedWriter(new FileWriter(newFile));
-
-                            bw.write(codeEditorTextArea.getText());
-                            messageTextArea.setText("");
-                            statusLabel.setText(newFile.getPath());
-                            openedFile = newFile;
-
-                            bw.close();
-                        }
-                    } else {
-                        BufferedWriter bw = new BufferedWriter(new FileWriter(openedFile));
-
-                        bw.write(codeEditorTextArea.getText());
-                        messageTextArea.setText("");
-
-                        bw.close();
-                    }
-                } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(frame, "Tipo de arquivo inválido.");
-                }
+                saveFile();
             }
         };
         saveFileButton.addActionListener(saveFileAction);
@@ -250,7 +198,7 @@ public class Main {
         Action compileAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                messageTextArea.setText("compilação de programas ainda não foi implementada");
+                compile();
             }
         };
         compileButton.addActionListener(compileAction);
@@ -269,7 +217,119 @@ public class Main {
         teamButton.getActionMap().put("teamShortcut", teamAction);
     }
 
-    private ImageIcon resizeIcon(String fileName) {
+    private static void saveFile() {
+        try {
+            if (Objects.isNull(openedFile)) {
+                int returnVal = fileChooser.showSaveDialog(frame);
+
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    File newFile = fileChooser.getSelectedFile();
+
+                    if(!newFile.getName().split("\\.")[1].equals("txt")){
+                        throw new IOException();
+                    }
+                    BufferedWriter bw = new BufferedWriter(new FileWriter(newFile));
+
+                    bw.write(codeEditorTextArea.getText());
+                    messageTextArea.setText("");
+                    statusLabel.setText(newFile.getPath());
+                    openedFile = newFile;
+
+                    bw.close();
+                }
+            } else {
+                BufferedWriter bw = new BufferedWriter(new FileWriter(openedFile));
+
+                bw.write(codeEditorTextArea.getText());
+                messageTextArea.setText("");
+
+                bw.close();
+            }
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(frame, "Tipo de arquivo inválido.");
+        }
+    }
+
+    private static void openFile() {
+        int returnVal = fileChooser.showOpenDialog(frame);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            try {
+                File file = fileChooser.getSelectedFile();
+
+                if (!file.getName().contains(".txt")) {
+                    throw new IOException();
+                }
+
+                BufferedReader br = new BufferedReader(new FileReader(file));
+                String string = "";
+                boolean firstLine = true;
+                codeEditorTextArea.setText("");
+                while (Objects.nonNull(string = br.readLine())) {
+                    if (firstLine) {
+                        codeEditorTextArea.setText(codeEditorTextArea.getText() + string);
+                        firstLine = false;
+                        continue;
+                    }
+                    codeEditorTextArea.setText(codeEditorTextArea.getText() + "\n" + string);
+                }
+
+                messageTextArea.setText("");
+                statusLabel.setText(file.getPath());
+                openedFile = file;
+                br.close();
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(frame, "Arquivo inválido.");
+            }
+        }
+    }
+
+    private static void compile(){
+        StringBuilder tokenList = new StringBuilder("linha        classe        lexema");
+        Lexico lexico = new Lexico();
+        lexico.setInput(codeEditorTextArea.getText());
+        try {
+            Token token = null;
+            while ((token = lexico.nextToken()) != null ) {
+                tokenList.append(calculateLinha(token.getPosition())).append("    |");
+                String classe = getClassFromTokenId(token.getId());
+
+                tokenList.append(token.getLexeme());
+
+                // só escreve o lexema, necessário escrever t.getId, t.getPosition()
+
+                // t.getId () - retorna o identificador da classe. Olhar Constants.java e adaptar, pois
+                // deve ser apresentada a classe por extenso
+                // t.getPosition () - retorna a posição inicial do lexema no editor, necessário adaptar
+                // para mostrar a linha
+
+                // esse código apresenta os tokens enquanto não ocorrer erro
+                // no entanto, os tokens devem ser apresentados SÓ se não ocorrer erro, necessário adaptar
+                // para atender o que foi solicitado
+            }
+        }
+        catch ( LexicalError e ) {  // tratamento de erros
+            System.out.println(e.getMessage() + " em " + e.getPosition());
+
+            // e.getMessage() - retorna a mensagem de erro de SCANNER_ERRO (olhar ScannerConstants.java
+            // e adaptar conforme o enunciado da parte 2)
+            // e.getPosition() - retorna a posição inicial do erro, tem que adaptar para mostrar a
+            // linha
+        }
+    }
+
+    private static int calculateLinha(int position){
+        return 0;
+    }
+
+    private static String getClassFromTokenId(int id) {
+        for (Field field : Constants.class.getDeclaredFields()) {
+            System.out.println(Constants.);
+        }
+
+        return null;
+    }
+
+    private static ImageIcon resizeIcon(String fileName) {
         ImageIcon imageIcon = new ImageIcon("src/main/resources/img/" + fileName);
         Image image = imageIcon.getImage();
         Image newimg = image.getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH);
