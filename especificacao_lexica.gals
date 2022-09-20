@@ -1,0 +1,76 @@
+#Options
+GenerateScanner = true
+GenerateParser = false
+Language = Java
+ScannerName = Lexico
+ScannerCaseSensitive = true
+ScannerTable = Compact
+Input = String
+#RegularDefinitions
+mai: [A-Z]
+min: [a-z]
+let: {mai} | {min}
+dig: [0-9]
+digex: [1-9]
+
+
+#Tokens
+//CONSTANTES
+id: {let} ( _? ( {let} | {dig} ) ) *
+cint: {dig}+ | {dig}* {digex} d {digex} {dig}*
+cfloat: {dig}* \. ( {dig}+ | {dig}* {digex} d {digex} {dig}* )
+cchar: \\ ( n | s | t )
+cstring: \" [ˆ \" \n \\ ]* \"
+
+//PALAVRAS RESERVADAS
+pr_boolean = id: "boolean"
+pr_break = id: "break"
+pr_char = id: "char"
+pr_do = id: "do"
+pr_else = id: "else"
+pr_end = id: "end"
+pr_false = id: "false"
+pr_float = id: "float"
+pr_fun = id: "fun"
+pr_if = id: "if"
+pr_int = id: "int"
+pr_main = id: "main"
+pr_print = id: "print"
+pr_println = id: "println"
+pr_readln = id: "readln"
+pr_string = id: "string"
+pr_true = id: "true"
+pr_val = id: "val"
+pr_var = id: "var"
+pr_while = id: "while"
+
+//SIMBOLOS ESPECIAIS
+":"
+","
+";"
+"="
+"("
+")"
+"{"
+"}"
+"=="
+"!="
+"<"
+">"
+"+"
+"-"
+"*"
+"/"
+"%"
+"&&"
+"||"
+"!"
+"++"
+"--"
+ 
+//FORMATACAO
+:[\s\t\n]
+
+//COMENTARIOS
+:! # .* 
+:! \[ \n [ˆ\[ \] ]* \n \]
