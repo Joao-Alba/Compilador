@@ -304,8 +304,12 @@ public class Main {
             tokenList.append("\n").append("programa compilado com sucesso");
             messageTextArea.setText(tokenList.toString());
 
-        } catch (LexicalError e) {
-            messageTextArea.setText("Erro na linha " + calculateLinha(e.getPosition()) + " - " + e.getMessage());
+        } catch (LexicalError error) {
+            if (error.getMessage().contains("símbolo inválido")) {
+                messageTextArea.setText("Erro na linha " + calculateLinha(error.getPosition()) + " - " + codeEditorTextArea.getText(error.getPosition(), 1) + " " + error.getMessage());
+            } else {
+                messageTextArea.setText("Erro na linha " + calculateLinha(error.getPosition()) + " - " + error.getMessage());
+            }
         } catch (BadLocationException e) {
             throw new RuntimeException(e);
         }
