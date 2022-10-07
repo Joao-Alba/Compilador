@@ -1,8 +1,6 @@
 package compilador;
 
-import gals.LexicalError;
-import gals.Lexico;
-import gals.Token;
+import gals.*;
 
 import java.awt.*;
 import javax.swing.*;
@@ -286,32 +284,25 @@ public class Main {
     }
 
     private static void compile() throws BadLocationException {
-        StringBuilder tokenList = new StringBuilder("linha      classe                  lexema").append("\n");
         Lexico lexico = new Lexico();
+        Sintatico sintatico = new Sintatico();
+        Semantico semantico = new Semantico();
+
         lexico.setInput(codeEditorTextArea.getText());
+
         try {
-            Token token;
-            while ((token = lexico.nextToken()) != null) {
-                String whiteSpaces = "                        ";
-                tokenList.append(calculateLinha(token.getPosition())).append("          ");
-
-                String tokenClass = getClassFromTokenId(token.getId());
-                tokenList.append(tokenClass).append(whiteSpaces.substring(tokenClass.length()));
-
-                tokenList.append(token.getLexeme()).append("\n");
-            }
-
-            tokenList.append("\n").append("programa compilado com sucesso");
-            messageTextArea.setText(tokenList.toString());
-
+            sintatico.parse(lexico, semantico);
+            messageTextArea.setText("programa compilado com sucesso");
         } catch (LexicalError error) {
             if (error.getMessage().contains("símbolo inválido")) {
                 messageTextArea.setText("Erro na linha " + calculateLinha(error.getPosition()) + " - " + codeEditorTextArea.getText(error.getPosition(), 1) + " " + error.getMessage());
             } else {
                 messageTextArea.setText("Erro na linha " + calculateLinha(error.getPosition()) + " - " + error.getMessage());
             }
-        } catch (BadLocationException e) {
-            throw new RuntimeException(e);
+        } catch (SyntaticError error) {
+            messageTextArea.setText("Erro na linha " + calculateLinha(error.getPosition()) +
+                    " - encontrado " + sintatico.getCurrentToken().getLexeme() + error.getMessage());
+        } catch (SemanticError e) {
         }
     }
 
