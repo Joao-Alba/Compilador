@@ -302,7 +302,9 @@ public class Main {
         } catch (SyntaticError error) {
             messageTextArea.setText("Erro na linha " + calculateLinha(error.getPosition()) +
                     " - encontrado " + sintatico.getCurrentToken().getLexeme() + error.getMessage());
-        } catch (SemanticError e) {
+        } catch (SemanticError error) {
+            messageTextArea.setText("Erro na linhaa " + calculateLinha(error.getPosition()) +
+                    " - encontrado " + sintatico.getCurrentToken().getLexeme() + error.getMessage());
         }
     }
 

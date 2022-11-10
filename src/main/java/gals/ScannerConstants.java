@@ -1178,7 +1178,7 @@ public interface ScannerConstants {
                     "",
                     "",
                     "",
-                    "onstante int inválida",
+                    "constante int inválida",
                     "",
                     "identificador inválido",
                     "comentário de bloco inválido ou não finalizado",

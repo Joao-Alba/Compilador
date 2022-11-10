@@ -7,7 +7,7 @@ ParserName = Sintatico
 SemanticName = Semantico
 ScannerCaseSensitive = true
 ScannerTable = Compact
-Input = Stream
+Input = String
 Parser = LL
 #RegularDefinitions
 mai: [A-Z]
@@ -23,7 +23,7 @@ id: {let} ( _? ( {let} | {dig} ) ) *
 cint: {dig}+ | {dig}* {digex} d {digex} {dig}*
 cfloat: {dig}* \. ( {dig}+ | {dig}* {digex} d {digex} {dig}* )
 cchar: \\ ( n | s | t )
-cstring: \" [Ë† \" \n \\ ]* \"
+cstring: \" [^ \" \n \\ ]* \"
 
 //PALAVRAS RESERVADAS
 pr_boolean = id: "boolean"
@@ -74,7 +74,7 @@ pr_while = id: "while"
 
 //COMENTARIOS
 :! # .* 
-:! \[ \n [Ë†\[ \] ]* \n \]
+:! \[ \n [^\[ \] ]* \n \]
 #NonTerminals
 <geral>
 <lista_instrucoes>
@@ -97,7 +97,6 @@ pr_while = id: "while"
 <cstring_opc>
 
 <saida>
-<tipo_saida>
 <lista_exp>
 <lista_exp1>
 
@@ -120,10 +119,10 @@ pr_while = id: "while"
 <termo_>
 <fator>
 #Grammar
-<geral> ::= pr_fun pr_main "{" <lista_instrucoes> "}" ;
+<geral> ::= #15 pr_fun pr_main "{" <lista_instrucoes> "}" #16 ;
 
 <lista_instrucoes> ::= <declaracao> <lista_instrucoes1> ;
-<lista_instrucoes1> ::= <lista_instrucoes> | Ã® ;
+<lista_instrucoes1> ::= <lista_instrucoes> | î ;
 <declaracao> ::= <dec_consts> | <dec_vars> | <comando> ;
 <dec_consts> ::= pr_val <lista_ids> <tipo_dec> ;
 <dec_vars> ::= pr_var <lista_ids> <tipo_dec> ;
@@ -131,7 +130,7 @@ pr_while = id: "while"
 <tipo_dec1> ::= ";" | "=" <valor> ";" ;
 
 <lista_ids> ::= id <lista_ids1> ;
-<lista_ids1> ::= Ã® | "," <lista_ids> ;
+<lista_ids1> ::= î | "," <lista_ids> ;
 <tipo> ::= pr_int | pr_float | pr_char | pr_string | pr_boolean ;
 <valor> ::= cint | cfloat | cchar | cstring | pr_true | pr_false ;
 <comando> ::= <atribuicao> | <entrada> | <saida> | <selecao> | <repeticao> | pr_break ";" ;
@@ -139,28 +138,27 @@ pr_while = id: "while"
 <atribuicao> ::= id "=" <expressao> ";" ;
 
 <entrada> ::= pr_readln "(" <cstring_opc> <lista_ids> ")" ";" ;
-<cstring_opc> ::= cstring "," | Ã® ;
+<cstring_opc> ::= cstring "," | î ;
 
-<saida> ::= <tipo_saida> "(" <lista_exp> ")" ";" ;
-<tipo_saida> ::= pr_print | pr_println ;
-<lista_exp> ::= <expressao> <lista_exp1> ;
-<lista_exp1> ::= Ã® | "," <lista_exp> ;
+<saida> ::= pr_print "(" <lista_exp> ")" ";" | pr_println "(" <lista_exp> ")" #17 ";" ;
+<lista_exp> ::= <expressao> #14 <lista_exp1> ;
+<lista_exp1> ::= î | "," <lista_exp> ;
 
 <selecao> ::= pr_if "(" <expressao> ")" <lista_cmd> <else> pr_end ";" ;
-<else> ::= pr_else <lista_cmd> | Ã® ;
+<else> ::= pr_else <lista_cmd> | î ;
 <lista_cmd> ::= <comando> <lista_cmd1> ;
-<lista_cmd1> ::= Ã® | <lista_cmd> ;
+<lista_cmd1> ::= î | <lista_cmd> ;
 
 <repeticao> ::= pr_do <lista_cmd> pr_while "(" <expressao> ")" pr_end ";" ;
 
 <expressao> ::= <elemento> <expressao_> ;
-<expressao_> ::= Ã® | "&&" <elemento> <expressao_> | "||" <elemento> <expressao_> ;
-<elemento> ::= <relacional> | pr_true | pr_false | "!" <elemento> ;
+<expressao_> ::= î | "&&" <elemento> #18 <expressao_> | "||" <elemento> #19 <expressao_> ;
+<elemento> ::= <relacional> | pr_true #11 | pr_false #12 | "!" <elemento> #13 ;
 <relacional> ::= <aritmetica> <relacional_> ;
-<relacional_> ::= Ã® | <operador_relacional> <aritmetica> ;
+<relacional_> ::= î | <operador_relacional> #9 <aritmetica> #10 ;
 <operador_relacional> ::= "==" | "!=" | "<" | ">" ;
 <aritmetica> ::= <termo> <aritmetica_> ;
-<aritmetica_> ::= Ã® | "+" <termo> <aritmetica_> | "-" <termo> <aritmetica_> ;
+<aritmetica_> ::= î | "+" <termo> #1 <aritmetica_> | "-" <termo> #2 <aritmetica_> ;
 <termo> ::= <fator> <termo_> ;
-<termo_> ::= Ã® | "*" <fator> <termo_> | "/" <fator> <termo_> | "%" <fator> <termo_> ;
-<fator> ::= id | cint | cfloat | cchar | cstring | "(" <expressao> ")" | "+" <fator> | "-" <fator> ;
+<termo_> ::= î | "*" <fator> #3 <termo_> | "/" <fator> #4 <termo_> | "%" <fator> #20 <termo_> ;
+<fator> ::= id | cint #5 | cfloat #6 | cchar #21 | cstring #22 | "(" <expressao> ")" | "+" <fator> #7 | "-" <fator> #8 ;
