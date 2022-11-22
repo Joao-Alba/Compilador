@@ -16,8 +16,12 @@ public class Semantico implements Constants {
 
 
     private String operador = "";
-    private StringBuilder codigo = new StringBuilder("");
-    private Stack<String> pilhaTipos;
+    public StringBuilder codigo = new StringBuilder("");
+    private Stack<String> pilhaTipos = new Stack<>();
+
+    public StringBuilder getCodigo() {
+        return codigo;
+    }
 
     public void executeAction(int action, Token token) throws SemanticError {
         switch(action){
@@ -132,9 +136,9 @@ public class Semantico implements Constants {
             throw new SemanticError(ERRO_TIPOS_ARITMETICA);
         }
 
-        codigo.append("ldc.i8 -1");
-        codigo.append("conv.r8");
-        codigo.append("mul");
+        codigo.append("\nldc.i8 -1");
+        codigo.append("\nconv.r8");
+        codigo.append("\nmul");
     }
 
     private void acao09(Token token){
@@ -145,7 +149,7 @@ public class Semantico implements Constants {
         String tipo1 = pilhaTipos.pop();
         String tipo2 = pilhaTipos.pop();
 
-        if(!tipo1.equals(tipo2)){
+        if(!(((tipo1.equals(FLOAT) || tipo1.equals(INT)) && (tipo2.equals(FLOAT) || tipo2.equals(INT))) || (tipo1.equals(STRING) && tipo2.equals(STRING)))){
             throw new SemanticError(ERRO_TIPOS_RELACIONAL);
         }
 
@@ -174,14 +178,14 @@ public class Semantico implements Constants {
             throw new SemanticError(ERRO_TIPO_LOGICA);
         }
 
-        codigo.append("ldc.i4.1");
-        codigo.append("xor");
+        codigo.append("\nldc.i4.1");
+        codigo.append("\nxor");
     }
 
     private void acao14() {
         String tipo = this.pilhaTipos.pop();
         if (tipo.equals(INT)) {
-            codigo.append("\nconv.r8");
+            codigo.append("\nconv.i8");
         }
         if(tipo.equals(CHAR)){
             tipo = STRING;
@@ -200,12 +204,13 @@ public class Semantico implements Constants {
     }
 
     private void acao16(){
-        codigo.append("ret\n" +
+        codigo.append("\nret\n" +
                 "       }\n" +
                 "    }\n");
     }
 
     private void acao17(){
+        codigo.append("\nldstr \"\\n\"");
         codigo.append("\ncall void [mscorlib]System.Console::Write(string)");
     }
 
