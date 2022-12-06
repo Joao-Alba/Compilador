@@ -293,6 +293,7 @@ public class Main {
         try {
             sintatico.parse(lexico, semantico);
             messageTextArea.setText("programa compilado com sucesso");
+            createCompiledFile(semantico);
         } catch (LexicalError error) {
             if (error.getMessage().contains("símbolo inválido")) {
                 messageTextArea.setText("Erro na linha " + calculateLinha(error.getPosition()) + " - " + codeEditorTextArea.getText(error.getPosition(), 1) + " " + error.getMessage());
@@ -300,11 +301,18 @@ public class Main {
                 messageTextArea.setText("Erro na linha " + calculateLinha(error.getPosition()) + " - " + error.getMessage());
             }
         } catch (SyntaticError error) {
+            if(sintatico.getCurrentToken().getLexeme().equals("$")){
+                messageTextArea.setText("Erro na linha " + calculateLinha(error.getPosition()) +
+                        " - encontrado " + "EOF" + error.getMessage());
+            }else {
+                messageTextArea.setText("Erro na linha " + calculateLinha(error.getPosition()) +
+                        " - encontrado " + sintatico.getCurrentToken().getLexeme() + error.getMessage());
+            }
+        } catch (SemanticError error) {
             messageTextArea.setText("Erro na linha " + calculateLinha(error.getPosition()) +
                     " - encontrado " + sintatico.getCurrentToken().getLexeme() + error.getMessage());
-        } catch (SemanticError error) {
-            messageTextArea.setText("Erro na linhaa " + calculateLinha(error.getPosition()) +
-                    " - encontrado " + sintatico.getCurrentToken().getLexeme() + error.getMessage());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -340,6 +348,16 @@ public class Main {
         Image image = imageIcon.getImage();
         Image newimg = image.getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH);
         return new ImageIcon(newimg);
+    }
+
+    private static void createCompiledFile(Semantico semantico) throws IOException {
+        String fileName = openedFile.getPath().split("\\.")[0] + ".il";
+        File file = new File(fileName);
+
+        BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+        bw.write(semantico.getCodigo().toString());
+
+        bw.close();
     }
 
 }

@@ -56,11 +56,11 @@ public interface ParserConstants {
                     {59},
                     {24, 55, 53},
                     {25, 55, 53},
-                    {27, 57, 54},
+                    {27, 57, 112, 113, 54},
                     {30, 58, 29},
                     {29},
                     {30, 58, 29},
-                    {2, 56},
+                    {2, 114, 56},
                     {0},
                     {28, 55},
                     {17},
@@ -80,22 +80,22 @@ public interface ParserConstants {
                     {66},
                     {70},
                     {8, 29},
-                    {2, 30, 71, 29},
-                    {21, 31, 62, 55, 32, 29},
-                    {6, 28},
+                    {2, 114, 30, 71, 116, 29},
+                    {21, 31, 62, 55, 117, 32, 29},
+                    {6, 104, 96, 28},
                     {0},
                     {19, 31, 64, 32, 29},
                     {20, 31, 64, 32, 99, 29},
                     {71, 96, 65},
                     {0},
                     {28, 64},
-                    {16, 31, 71, 32, 68, 67, 12, 29},
-                    {11, 68},
+                    {16, 31, 71, 32, 106, 68, 67, 12, 108, 29},
+                    {11, 107, 68},
                     {0},
                     {59, 69},
                     {0},
                     {68},
-                    {10, 68, 26, 31, 71, 32, 12, 29},
+                    {109, 10, 68, 26, 31, 71, 32, 110, 12, 29},
                     {73, 72},
                     {0},
                     {44, 73, 100, 72},
@@ -120,7 +120,7 @@ public interface ParserConstants {
                     {41, 81, 85, 80},
                     {42, 81, 86, 80},
                     {43, 81, 102, 80},
-                    {2},
+                    {2, 115},
                     {3, 87},
                     {4, 88},
                     {5, 103},
@@ -135,7 +135,7 @@ public interface ParserConstants {
                     "",
                     " esperado EOF", //"Era esperado fim de programa
                     " esperado id",  //"Era esperado id
-                    " esperado constante_integer",  //"Era esperado cint
+                    " esperado constante_int",  //"Era esperado cint
                     " esperado constante_float",  //"Era esperado cfloat
                     " esperado constante_char",  //"Era esperado cchaar
                     " esperado constante_string",  //"Era esperado cstring
@@ -194,7 +194,7 @@ public interface ParserConstants {
                     " esperado id  break  do  if  print  println  readln", //"<comando> inválido"
                     " esperado id", //"<atribuicao> inválido"
                     " esperado readln", //"<entrada> inválido"
-                    " esperado id  string", //"<cstring_opc> inválido"
+                    " esperado id  constante_string", //"<cstring_opc> inválido"
                     " esperado print  println", //"<saida> inválido"
                     " esperado expressão", //"<lista_exp> inválido"
                     " esperado ,  )", //"<lista_exp1> inválido"

@@ -1,5 +1,8 @@
 package gals;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Stack;
 
 public class Semantico implements Constants {
@@ -9,6 +12,7 @@ public class Semantico implements Constants {
     private final String STRING = "string";
     private final String CHAR = "char";
     private final String BOOLEAN = "bool";
+
     private final String ERRO_TIPOS_ARITMETICA = "tipos incompatíveis em expressão aritmética";
     private final String ERRO_TIPOS_RELACIONAL = "tipos incompatíveis em expressão relacional";
     private final String ERRO_TIPOS_LOGICA = "tipos incompatíveis em expressão lógica";
@@ -18,6 +22,10 @@ public class Semantico implements Constants {
     private String operador = "";
     public StringBuilder codigo = new StringBuilder("");
     private Stack<String> pilhaTipos = new Stack<>();
+    private String tipoVar = "";
+    private List<String> listaIds = new ArrayList<>();
+    private Stack<String> pilhaRotulos = new Stack<>();
+    private HashMap<String, String> tabelaSimbolos = new HashMap<>();
 
     public StringBuilder getCodigo() {
         return codigo;
@@ -47,6 +55,17 @@ public class Semantico implements Constants {
             case 20: this.acao20(); break;
             case 21: this.acao21(token); break;
             case 22: this.acao22(token); break;
+            case 24: this.acao24(); break;
+            case 25: this.acao25(); break;
+            case 26: this.acao26(); break;
+            case 27: this.acao27(); break;
+            case 28: this.acao28(); break;
+            case 30: this.acao30(token); break;
+            case 31: this.acao31(); break;
+            case 32: this.acao32(token); break;
+            case 33: this.acao33(token); break;
+            case 34: this.acao34(); break;
+            case 35: this.acao35(); break;
         }
         System.out.println("Ação #" + action + ", Token: " + token);
     }
@@ -267,7 +286,100 @@ public class Semantico implements Constants {
         codigo.append("\nldstr ").append(token.getLexeme());
     }
 
-    public String converterInt(String numero){
+    private void acao24(){
+        String rotulo = novoRotulo();
+        codigo.append("\nbrfalse ").append(rotulo);
+        pilhaRotulos.push(rotulo);
+    }
+
+    private void acao25(){
+        String rotulo = novoRotulo();
+        codigo.append("\nbr ").append(rotulo);
+        codigo.append("\n").append(pilhaRotulos.pop()).append(":");
+        pilhaRotulos.push(rotulo);
+    }
+
+    private void acao26(){
+        codigo.append("\n").append(pilhaRotulos.pop()).append(":");
+    }
+
+    private void acao27(){
+        String rotulo = novoRotulo();
+        codigo.append("\n").append(rotulo).append(":");
+        pilhaRotulos.push(rotulo);
+    }
+
+    private void acao28(){
+        String rotulo = pilhaRotulos.pop();
+        codigo.append("\nbrtrue ").append(rotulo);
+    }
+
+    private void acao30(Token token){
+        switch (token.getLexeme()){
+            case "int": tipoVar = INT; break;
+            case "float": tipoVar = FLOAT; break;
+            case "char": tipoVar = CHAR; break;
+            case "string": tipoVar = STRING; break;
+            case "boolean": tipoVar = BOOLEAN; break;
+        }
+    }
+
+    private void acao31(){
+        listaIds.forEach(id -> {
+            String tipoVar = this.tipoVar.equals(CHAR) ? STRING : this.tipoVar;
+            codigo.append("\n.locals (").append(tipoVar).append(" ").append(id).append(")");
+            tabelaSimbolos.put(id, tipoVar);
+        });
+
+        listaIds.clear();
+    }
+
+    private void acao32(Token token){
+        listaIds.add(token.getLexeme());
+    }
+
+    private void acao33(Token token){
+        String id = token.getLexeme();
+        pilhaTipos.push(tabelaSimbolos.get(id));
+
+        codigo.append("\nldloc ").append(id);
+        if(tabelaSimbolos.get(id).equals(INT)){
+            codigo.append("\nconv.r8");
+        }
+    }
+
+    private void acao34(){
+        String id = listaIds.get(0);
+        String tipo = pilhaTipos.pop();
+
+        if(tabelaSimbolos.get(id).equals(INT)){
+            codigo.append("\nconv.i8");
+        }
+        codigo.append("\nstloc ").append(id);
+    }
+
+    private void acao35(){
+        listaIds.forEach(id -> {
+            String tipo = tabelaSimbolos.get(id);
+            String classe = "";
+
+            switch (tipo){
+                case INT: classe = "Int64";break;
+                case FLOAT: classe = "Double";break;
+                case BOOLEAN: classe = "Boolean";break;
+                case CHAR:
+                case STRING: classe = "Console";break;
+            }
+
+            codigo.append("\ncall string [mscorlib]System.Console::ReadLine()");
+            codigo.append("\ncall ").append(tipo).append(" [mscorlib]System.").append(classe).append("::Parse(string)");
+            codigo.append("\nstloc ").append(id);
+        });
+
+        listaIds.clear();
+    }
+
+    private String converterInt(String numero){
         double resultado = Double.parseDouble(numero.split("d")[0]);
         if(numero.contains("d")){
             resultado = resultado * (Math.pow(10, Integer.parseInt(numero.split("d")[1])));
@@ -276,12 +388,16 @@ public class Semantico implements Constants {
         return String.valueOf((int) resultado);
     }
 
-    public String converterFloat(String numero){
+    private String converterFloat(String numero){
         double resultado = Double.parseDouble(numero.split("d")[0]);
         if(numero.contains("d")){
             resultado = resultado * (Math.pow(10, Integer.parseInt(numero.split("d")[1])));
         }
 
         return String.valueOf(resultado);
+    }
+
+    private String novoRotulo(){
+        return "rotulo_" + (pilhaRotulos.size() + 1);
     }
 }

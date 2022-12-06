@@ -126,30 +126,30 @@ pr_while = id: "while"
 <declaracao> ::= <dec_consts> | <dec_vars> | <comando> ;
 <dec_consts> ::= pr_val <lista_ids> <tipo_dec> ;
 <dec_vars> ::= pr_var <lista_ids> <tipo_dec> ;
-<tipo_dec> ::= ":" <tipo> <tipo_dec1> | "=" <valor> ";" ;
+<tipo_dec> ::= ":" <tipo> #30 #31 <tipo_dec1> | "=" <valor> ";" ;
 <tipo_dec1> ::= ";" | "=" <valor> ";" ;
 
-<lista_ids> ::= id <lista_ids1> ;
+<lista_ids> ::= id #32 <lista_ids1> ;
 <lista_ids1> ::= î | "," <lista_ids> ;
 <tipo> ::= pr_int | pr_float | pr_char | pr_string | pr_boolean ;
 <valor> ::= cint | cfloat | cchar | cstring | pr_true | pr_false ;
 <comando> ::= <atribuicao> | <entrada> | <saida> | <selecao> | <repeticao> | pr_break ";" ;
 
-<atribuicao> ::= id "=" <expressao> ";" ;
+<atribuicao> ::= id #32 "=" <expressao> #34 ";" ;
 
-<entrada> ::= pr_readln "(" <cstring_opc> <lista_ids> ")" ";" ;
-<cstring_opc> ::= cstring "," | î ;
+<entrada> ::= pr_readln "(" <cstring_opc> <lista_ids> #35 ")" ";" ;
+<cstring_opc> ::= cstring #22 #14 "," | î ;
 
 <saida> ::= pr_print "(" <lista_exp> ")" ";" | pr_println "(" <lista_exp> ")" #17 ";" ;
 <lista_exp> ::= <expressao> #14 <lista_exp1> ;
 <lista_exp1> ::= î | "," <lista_exp> ;
 
-<selecao> ::= pr_if "(" <expressao> ")" <lista_cmd> <else> pr_end ";" ;
-<else> ::= pr_else <lista_cmd> | î ;
+<selecao> ::= pr_if "(" <expressao> ")" #24 <lista_cmd> <else> pr_end #26 ";" ;
+<else> ::= pr_else #25 <lista_cmd> | î ;
 <lista_cmd> ::= <comando> <lista_cmd1> ;
 <lista_cmd1> ::= î | <lista_cmd> ;
 
-<repeticao> ::= pr_do <lista_cmd> pr_while "(" <expressao> ")" pr_end ";" ;
+<repeticao> ::= #27 pr_do <lista_cmd> pr_while "(" <expressao> ")" #28 pr_end ";" ;
 
 <expressao> ::= <elemento> <expressao_> ;
 <expressao_> ::= î | "&&" <elemento> #18 <expressao_> | "||" <elemento> #19 <expressao_> ;
@@ -161,4 +161,4 @@ pr_while = id: "while"
 <aritmetica_> ::= î | "+" <termo> #1 <aritmetica_> | "-" <termo> #2 <aritmetica_> ;
 <termo> ::= <fator> <termo_> ;
 <termo_> ::= î | "*" <fator> #3 <termo_> | "/" <fator> #4 <termo_> | "%" <fator> #20 <termo_> ;
-<fator> ::= id | cint #5 | cfloat #6 | cchar #21 | cstring #22 | "(" <expressao> ")" | "+" <fator> #7 | "-" <fator> #8 ;
+<fator> ::= id #33 | cint #5 | cfloat #6 | cchar #21 | cstring #22 | "(" <expressao> ")" | "+" <fator> #7 | "-" <fator> #8 ;
